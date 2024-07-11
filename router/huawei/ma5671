@@ -1,0 +1,35 @@
+reset MA5671
+192.168.100.2 -access--> 192.168.100.1
+act: telecomadmin
+pwd: admintelecom
+
+
+### LOID&VID
+lan->lan口工作模式： 勾选lan口
+系统工具-ONT认证： 填写LOID
+wan-wan配置： {
+PPPoe: true
+协议类型：ipv4&v6
+wan类型: bridge wan
+服务类型： internet
+使能VLAN: true
+VLAN ID: 41
+绑定项: lan 1 lan2
+}
+
+### SN & MAC
+telnet 192.168.100.1
+root admin to login
+su sudo  (use sucalculate,downgradge rom if error happen)
+set sn SNID (set sn MAC: old method)
+set wanmac MAC
+set productmac MAC
+
+upgrade/downgrade: 系统工具-版本文件升级
+20x version， port feature： auto
+
+
+loid: 2041971862
+set sn SKYWA045AC48
+set wanmac 681AA4666D0A/681AA4666D0B
+set productmac MAC
