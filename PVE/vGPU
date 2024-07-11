@@ -1,0 +1,196 @@
+
+######  ######  ######
+######  HOST  ########
+######  ######  ######
+
+=== STEP 1 -  IOMMU
+vi /etc/default/grub
+intel_iommu=on iommu=pt initcall_blacklist=sysfb_init video=efifb:off kvm.ignore_msrs=1 pcie_acs_override=downstream,multifunction
+
+=== extend logic volume
+lvextend -l +100%free -r pve/root
+
+=== STEP 2 - ENV
+apt install apt-transport-https ca-certificates
+
+#PVE 6
+echo "deb https://mirrors.tuna.tsinghua.edu.cn/debian/ buster main contrib non-free" > /etc/apt/sources.list
+echo "deb https://mirrors.tuna.tsinghua.edu.cn/debian/ buster-updates main contrib non-free"  >> /etc/apt/sources.list
+echo "deb https://mirrors.tuna.tsinghua.edu.cn/debian/ buster-backports main contrib non-free"  >> /etc/apt/sources.list
+echo "deb https://mirrors.tuna.tsinghua.edu.cn/debian-security buster/updates main contrib non-free"  >> /etc/apt/sources.list
+echo "deb https://mirrors.tuna.tsinghua.edu.cn/proxmox/debian buster pve-no-subscription"  >> /etc/apt/sources.list
+cat /etc/apt/sources.list
+
+
+#PVE 7
+echo "deb https://mirrors.tuna.tsinghua.edu.cn/proxmox/debian bullseye pve-no-subscription" > /etc/apt/sources.list.d/pve-enterprise.list
+cat /etc/apt/sources.list.d/pve-enterprise.list
+echo "deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye main contrib non-free" > /etc/apt/sources.list
+echo "deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye-updates main contrib non-free"  >> /etc/apt/sources.list
+echo "deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye-backports main contrib non-free"  >> /etc/apt/sources.list
+echo "deb https://mirrors.tuna.tsinghua.edu.cn/debian-security bullseye-security main contrib non-free"  >> /etc/apt/sources.list
+echo "deb https://mirrors.tuna.tsinghua.edu.cn/proxmox/debian bullseye pve-no-subscription"  >> /etc/apt/sources.list
+cat /etc/apt/sources.list
+
+
+echo "deb https://mirrors.tuna.tsinghua.edu.cn/proxmox/debian bullseye pve-no-subscription" > /etc/apt/sources.list.d/pve-enterprise.list
+cat /etc/apt/sources.list.d/pve-enterprise.list
+echo "deb https://mirrors.ustc.edu.cn/debian/ bullseye main contrib non-free" > /etc/apt/sources.list
+echo "deb https://mirrors.ustc.edu.cn/debian/ bullseye-updates main contrib non-free"  >> /etc/apt/sources.list
+echo "deb https://mirrors.ustc.edu.cn/debian/ bullseye-backports main contrib non-free"  >> /etc/apt/sources.list
+echo "deb https://mirrors.ustc.edu.cn/debian-security bullseye-security main contrib"  >> /etc/apt/sources.list
+echo "deb https://mirrors.ustc.edu.cn/proxmox/debian bullseye pve-no-subscription"  >> /etc/apt/sources.list
+cat /etc/apt/sources.list
+
+
+
+#PVE 8
+echo "deb https://mirrors.ustc.edu.cn/proxmox/debian/ceph-quincy/ bookworm no-subscription" > /etc/apt/sources.list.d/ceph.list
+cat /etc/apt/sources.list.d/ceph.list
+echo "deb https://mirrors.ustc.edu.cn/proxmox/debian/pve bookworm pve-no-subscription" > /etc/apt/sources.list.d/pve-enterprise.list
+cat /etc/apt/sources.list.d/pve-enterprise.list
+echo "deb https://mirrors.ustc.edu.cn/debian bookworm main contrib  non-free non-free-firmware" > /etc/apt/sources.list
+echo "deb https://mirrors.ustc.edu.cn/debian-security/ bookworm-security main contrib non-free non-free-firmware"  >> /etc/apt/sources.list
+echo "deb https://mirrors.ustc.edu.cn/debian bookworm-updates main contrib non-free non-free-firmware"  >> /etc/apt/sources.list
+echo "deb https://mirrors.ustc.edu.cn/debian bookworm-backports main contrib non-free non-free-firmware"  >> /etc/apt/sources.list
+echo "deb https://mirrors.ustc.edu.cn/proxmox/debian bookworm pve-no-subscription"  >> /etc/apt/sources.list
+cat /etc/apt/sources.list
+
+
+echo "deb https://mirrors.ustc.edu.cn/debian/ bookworm main contrib non-free" > /etc/apt/sources.list
+echo "deb https://mirrors.ustc.edu.cn/debian/ bookworm-updates main contrib non-free"  >> /etc/apt/sources.list
+echo "deb https://mirrors.ustc.edu.cn/debian/ bookworm-backports main contrib non-free"  >> /etc/apt/sources.list
+echo "deb https://mirrors.ustc.edu.cn/debian-security bookworm-security main contrib "  >> /etc/apt/sources.list
+echo "deb https://mirrors.ustc.edu.cn/proxmox/debian bookworm pve-no-subscription"  >> /etc/apt/sources.list
+cat /etc/apt/sources.list
+
+#
+echo "blacklist nouveau" >> /etc/modprobe.d/pve-blacklist.conf
+echo "blacklist nvidia" >> /etc/modprobe.d/pve-blacklist.conf
+echo "blacklist snd_hda_intel" >> /etc/modprobe.d/pve-blacklist.conf
+echo "blacklist snd_hda_codec_hdmi" >> /etc/modprobe.d/pve-blacklist.conf
+echo "blacklist snd_hda_codec" >> /etc/modprobe.d/pve-blacklist.conf
+echo "blacklist snd_hda_core" >> /etc/modprobe.d/pve-blacklist.conf
+echo "blacklist radeon" >> /etc/modprobe.d/pve-blacklist.conf
+echo "blacklist amdgpu" >> /etc/modprobe.d/pve-blacklist.conf
+echo "blacklist i915" >> /etc/modprobe.d/pve-blacklist.conf
+cat /etc/modprobe.d/pve-blacklist.conf
+echo "options kvm ignore_msrs=1 report_ignored_msrs=0" > /etc/modprobe.d/kvm.conf
+cat /etc/modprobe.d/kvm.conf
+echo "vfio" >> /etc/modules
+echo "vfio_iommu_type1" >> /etc/modules
+echo "vfio_pci" >> /etc/modules
+echo "vfio_virqfd" >> /etc/modules
+cat /etc/modules
+
+### guideline
+lspci -nn 8086:041a 8086:0c0c
+.\EfiRom.exe -f 0x8086 -i 0x041a -e .\IntelGopDriver.efi .\IgdAssignmentDxe.efi .\PlatformGOPPolicy.efi -o z97x.rom
+.\EfiRom.exe -f 0x8086 -i 0x041a -e .\IntelGopDriver.efi .\IgdAssignmentDxe.efi .\PlatformGOPPolicy.efi .\vbt.bin -o z97xb.rom
+args: -set device.hostpci0.addr=02.0 -set device.hostpci0.x-igd-gms=1 -set device.hostpci0.x-igd-opregion=on
+hostpci0: 0000:00:02,legacy-igd=1,romfile=xxxx.rom
+
+apt-get update
+apt-get install -y git build-essential
+git clone <https://github.com/awilliam/rom-parser> && cd rom-parser && make
+cd /sys/bus/pci/devices/0000:00:02.0
+echo 1 > rom
+cat rom > /usr/share/kvm/vbios.bin
+echo 0 > rom
+cd rom-parser
+./rom-parser /usr/share/kvm/vbios.bin
+./rom-fixer /usr/share/kvm/vbios.bin
+
+### original
+args: -set device.hostpci0.addr=0x02 -set device.hostpci0.x-igd-gms=1 -set device.hostpci0.x-igd-opregion=on -set device.hostpci0.x-vga=on
+args: -set device.hostpci0.addr=0x02 -set device.hostpci0.x-vga=on
+hostpci0: 00:02.0,pcie=1,x-vga=1,romfile=vbios.bin
+#
+apt update
+apt install -y build-essential dkms pve-headers-$(uname -r) mdevctl
+update-grub
+update-initramfs -u -k all
+
+#
+reboot
+
+=== STEP 3 - HOOK & Driver Install
+### vgpu lock
+mkdir -p /opt/vgpu_unlock-rs/target/release
+mkdir /etc/vgpu_unlock
+touch /etc/vgpu_unlock/profile_override.toml
+mkdir /etc/systemd/system/{nvidia-vgpud.service.d,nvidia-vgpu-mgr.service.d}
+echo -e "[Service]\nEnvironment=LD_PRELOAD=/opt/vgpu_unlock-rs/target/release/libvgpu_unlock_rs.so" > /etc/systemd/system/nvidia-vgpud.service.d/vgpu_unlock.conf
+echo -e "[Service]\nEnvironment=LD_PRELOAD=/opt/vgpu_unlock-rs/target/release/libvgpu_unlock_rs.so" > /etc/systemd/system/nvidia-vgpu-mgr.service.d/vgpu_unlock.conf
+
+cat /etc/systemd/system/{nvidia-vgpud.service.d,nvidia-vgpu-mgr.service.d}/*
+cd  /opt/vgpu_unlock-rs/target/release
+
+### Driver install
+chmod +x *run
+./NV
+*** building kernel modules
+*** register kernel module sources with DKMS? -> yes
+*** Installation of the NVIDIA Accelerated Graphics Driver for Linux-x86_64 (version: 525.85.07) is now complete. -> OK
+
+=== STEP 4 - verification
+systemctl restart {nvidia-vgpud.service,nvidia-vgpu-mgr.service}
+nvidia-smi
+mdevctl types
+dkms status
+
+######  VM & License Conf ######
+=== hidden vm info 1
+## way 1
+cd /etc/pve/qeum
+args: -cpu 'host,-hypervisor,+kvm_pv_unhalt,+kvm_pv_eoi,hv_spinlocks=0x1fff,hv_vapic,hv_time,hv_reset,hv_vpindex,hv_runtime,hv_relaxed,kvm=off,hv_vendor_id=intel'
+cpu: host,hidden=1
+hostpci0: 0000:01:00.0,mdev=nvidia-48,pcie=1
+
+## way 2
+vi /etc/pve/virtual-guest/cpu-models.conf
+cpu-model: hostPro
+    flags -hypervisor;+hv-evmcs;+pcid
+    hidden 1
+    phys-bits host
+    hv-vendor-id proxmox
+    reported-model host
+
+#echo "options kvm_intel nested=1" >> /etc/modprobe.conf
+#cat /sys/module/kvm_intel/parameters/nested
+
+== Lincense Server
+docker run -d -e LEASE_EXPIRE_DAYS=1825 --name nvServer -e DLS_URL=192.168.0.156 -e DLS_PORT=443 -p 443:443 makedie/fastapi-dls
+
+######  ######  ######
+######  GUEST ########
+######  ######  ######
+============= Windows
+## upload and install driver
+## get token to guest (win+x,a)
+curl.exe --insecure -L -X GET https://192.168.0.156/-/client-token -o "C:\Program Files\NVIDIA Corporation\vGPU Licensing\ClientConfigToken\client_configuration_token_$($(Get-Date).tostring('dd-MM-yy-hh-mm-ss')).tok"
+## verify status
+Restart-Service NVDisplay.ContainerLocalSystem
+nvidia-smi.exe -q | Select-String License
+
+
+=============  Linux
+# 和宿主安装驱动相似，禁用 nouveau 并安装必须软件包
+echo "blacklist nouveau" >> /etc/modprobe.d/blacklist.conf
+apt install build-essential gcc-multilib dkms mdevctl
+update-initramfs -k all -u
+reboot
+
+# 重启完成后安装 Guest 驱动
+chmod +x NVIDIA-Linux-x86_64-430.63-grid.run
+./NVIDIA-Linux-x86_64-430.63-grid.run
+
+# <ls-hostname-or-ip>为你的授权服务IP端口
+curl --insecure -L -X GET https://<dls-hostname-or-ip>/-/client-token -o /etc/nvidia/ClientConfigToken/client_configuration_token_$(date '+%d-%m-%Y-%H-%M-%S').tok
+
+
+# 验证安装是否成功
+dkms status
+nvidia-smi
+nvidia-smi -q | grep License # 查看授权，Unlicensed (Unrestricted) 表示未授权
+
